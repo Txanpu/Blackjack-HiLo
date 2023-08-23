@@ -1,0 +1,185 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contador de HI-LO</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 20px;
+  }
+  button {
+    margin: 5px;
+  }
+  .hidden {
+    display: none;
+  }
+</style>
+</head>
+<body>
+  <h1>Contador de HI-LO by Txanpu</h1>
+  <p>Hi-Lo: <span id="sumaTotal">0</span></p>
+  <p class="hidden">Cartas pasadas: <span id="vecesClickeado">0</span></p>
+  <p class="hidden">Baraja: <span id="baraja">1</span></p>
+  <label for="totalBarajas">Total de Barajas: </label>
+  <input type="number" id="totalBarajas" value="1">
+  <p class="hidden">Barajas restantes: <span id="barajasRestantes">0</span></p>
+  <p class="hidden">Seguridad: <span id="seguridad">0</span></p>
+  <p>Cartas restantes: <span id="cartasRestantes">0</span></p>
+  <p>Seguridad: <span id="seguridad2">0</span></p>
+  <p>Probabilidad de carta alta: <span id="probabilidadCartaAlta">0.00%</span></p>
+  <p class="hidden">Clics restar: <span id="clicsRestar">0</span></p>
+  <button id="sumarBtn">Sumar (2, 3, 4, 5, 6)</button>
+  <button id="noSumarBtn">No Sumar (7, 8, 9)</button>
+  <button id="restarBtn">Restar (10, J, Q, K, A)</button>
+  <button id="reiniciarBtn">Reiniciar</button>
+
+  <script>
+    const valoresSumar = [1];
+    const valoresNoSumar = [];
+    const valoresRestar = [-1];
+    const cambioDeBaraja = 52;
+
+    let total = 0;
+    let clics = 0;
+    let clicsRestar = 0
+    let baraja = 1;
+    let clicsNoSumar = 0;
+
+
+    const sumaTotalElement = document.getElementById('sumaTotal');
+    const vecesClickeadoElement = document.getElementById('vecesClickeado');
+    const barajaElement = document.getElementById('baraja');
+    const totalBarajasInput = document.getElementById('totalBarajas');
+    const barajasRestantesElement = document.getElementById('barajasRestantes');
+    const seguridadElement = document.getElementById('seguridad');
+    const cartasRestantesElement = document.getElementById('cartasRestantes');
+    const seguridad2Element = document.getElementById('seguridad2');
+    const probabilidadCartaAltaElement = document.getElementById('probabilidadCartaAlta');
+    const sumarBtn = document.getElementById('sumarBtn');
+    const noSumarBtn = document.getElementById('noSumarBtn');
+    const restarBtn = document.getElementById('restarBtn');
+    const reiniciarBtn = document.getElementById('reiniciarBtn');
+
+    totalBarajasInput.addEventListener('input', () => {
+      actualizarBarajas();
+      actualizarCartasRestantes();
+      actualizarSeguridad();
+      actualizarSeguridad2();
+      actualizarProbabilidadCartaAlta();
+    });
+
+    sumarBtn.addEventListener('click', () => {
+      modificarTotal(valoresSumar);
+      actualizarBarajas();
+      actualizarCartasRestantes();
+      actualizarSeguridad();
+      actualizarSeguridad2();
+      actualizarProbabilidadCartaAlta();
+      
+    });
+    
+    noSumarBtn.addEventListener('click', () => {
+      modificarTotal(valoresNoSumar, false);
+      actualizarBarajas();
+      actualizarCartasRestantes();
+      actualizarSeguridad();
+      actualizarSeguridad2();
+      actualizarProbabilidadCartaAlta();
+      clicsNoSumar++
+      
+    });
+    
+    restarBtn.addEventListener('click', () => {
+      modificarTotal(valoresRestar, false);
+      actualizarBarajas();
+      actualizarCartasRestantes();
+      actualizarSeguridad();
+      actualizarSeguridad2();
+      actualizarProbabilidadCartaAlta();
+      clicsRestar++;
+      actualizarClicsRestar();
+    });
+
+ function actualizarClicsRestar() {
+      const clicsRestarElement = document.getElementById('clicsRestar');
+      clicsRestarElement.textContent = clicsRestar;
+    }
+    
+    reiniciarBtn.addEventListener('click', reiniciar);
+
+    function calcularProbabilidadCartaAlta() {
+  const totalBarajas = parseInt(totalBarajasInput.value);
+  const cartasPasadas = clics * valoresSumar.length;
+  const cartasRestantes = totalBarajas * cambioDeBaraja - cartasPasadas - 1;
+  const totalCartasAltas = (20 * totalBarajas) - clicsRestar - 1;
+  const probabilidadCartaAlta = (100 * totalCartasAltas) / cartasRestantes;
+  return probabilidadCartaAlta;
+}
+
+     function actualizarProbabilidadCartaAlta() {
+        const probabilidadCartaAlta = calcularProbabilidadCartaAlta();
+        probabilidadCartaAltaElement.textContent = probabilidadCartaAlta.toFixed(2);
+     }
+
+     function actualizarTotal() {
+       sumaTotalElement.textContent = total;
+       vecesClickeadoElement.textContent = clics;
+       barajaElement.textContent = baraja;
+     }
+
+     function actualizarBarajas() {
+       const totalBarajas = parseInt(totalBarajasInput.value);
+       const barajasRestantes = totalBarajas - baraja;
+       barajasRestantesElement.textContent = barajasRestantes;
+     }
+
+     function actualizarCartasRestantes() {
+       const totalBarajas = parseInt(totalBarajasInput.value);
+       const cartasPasadas = clics * valoresSumar.length;
+       const cartasRestantes = totalBarajas * cambioDeBaraja - cartasPasadas - 1;
+       cartasRestantesElement.textContent = cartasRestantes;
+     }
+
+     function actualizarSeguridad() {
+       const totalBarajas = parseInt(totalBarajasInput.value);
+       const barajasRestantes = totalBarajas - baraja;
+       const seguridad = total / barajasRestantes;
+       seguridadElement.textContent = seguridad.toFixed(2); // Mostrar con 2 decimales
+     }
+
+     function actualizarSeguridad2() {
+       const totalBarajas = parseInt(totalBarajasInput.value);
+       const cartasPasadas = clics * valoresSumar.length;
+       const cartasRestantes = totalBarajas * cambioDeBaraja - cartasPasadas - 1;
+       const seguridad2 = total * cambioDeBaraja / cartasRestantes;
+       seguridad2Element.textContent = seguridad2.toFixed(2); // Mostrar con 2 decimales
+     }
+
+     function modificarTotal(valores, sumar = true) {
+       total += sumar ? valores.length : -valores.length;
+       clics++;
+       if (clics % cambioDeBaraja === 0) {
+         baraja++;
+       }
+       actualizarTotal();
+     }
+
+     function reiniciar() {
+       const confirmacion = confirm('¿Estás seguro de que deseas reiniciar el contador?');
+       if (confirmacion) {
+         total = 0;
+         clics = 0;
+         baraja = 1;
+         actualizarTotal();
+         actualizarBarajas();
+         actualizarCartasRestantes();
+         actualizarSeguridad();
+         actualizarSeguridad2();
+         actualizarProbabilidadCartaAlta();
+       }
+     }
+  </script>
+</body>
+</html>
